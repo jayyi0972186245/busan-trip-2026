@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#075985">
+  <title>釜山安心遊</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.webmanifest">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">6 人・四天三夜</p>
+      <h1>釜山安心遊</h1>
+      <p class="trip-date">2026/10/17（六）－ 10/20（二）</p>
+    </div>
+    <button id="font-toggle" class="icon-button" type="button" aria-label="切換字體大小">
+      <strong>字</strong><small>放大</small>
+    </button>
+  </header>
+
+  <main>
+    <nav class="main-tabs" aria-label="主要功能">
+      <button class="main-tab active" data-view="trip" type="button">每日行程</button>
+      <button class="main-tab" data-view="prep" type="button">行前注意事項</button>
+      <button class="main-tab" data-view="info" type="button">重要資訊</button>
+    </nav>
+
+    <section id="trip-view">
+      <div class="quick-panel">
+        <button id="add-trip" class="primary-button" type="button">＋ 新增行程</button>
+        <button class="secondary-button backup-button" type="button">備份資料</button>
+      </div>
+      <nav id="day-tabs" class="day-tabs" aria-label="選擇日期"></nav>
+      <div class="section-heading">
+        <div><p id="selected-date"></p><h2 id="selected-title"></h2></div>
+        <span id="trip-count" class="badge"></span>
+      </div>
+      <section id="trip-list" class="card-list" aria-live="polite"></section>
+    </section>
+
+    <section id="prep-view" hidden>
+      <div class="quick-panel">
+        <button id="add-prep" class="primary-button" type="button">＋ 新增注意事項</button>
+        <button class="secondary-button backup-button" type="button">備份資料</button>
+      </div>
+      <div class="section-heading">
+        <div><p>出發前逐項確認</p><h2>行前注意事項</h2></div>
+        <span id="prep-count" class="badge"></span>
+      </div>
+      <div id="prep-filters" class="filter-row"></div>
+      <section id="prep-list" class="card-list" aria-live="polite"></section>
+    </section>
+
+    <section id="info-view" hidden>
+      <div class="quick-panel">
+        <button id="edit-info" class="primary-button" type="button">編輯重要資訊</button>
+        <button id="share-button" class="secondary-button" type="button">分享目前頁面</button>
+      </div>
+      <div class="section-heading">
+        <div><p>旅途中快速查找</p><h2>航班、飯店與緊急聯絡</h2></div>
+      </div>
+      <section id="info-list" class="card-list"></section>
+      <article class="card sync-card">
+        <h3>分享與多人同步</h3>
+        <p id="sync-status" class="meta"></p>
+        <div class="card-actions">
+          <button id="cloud-login" class="primary-button" type="button">旅伴登入</button>
+          <button id="cloud-logout" class="secondary-button" type="button" hidden>登出</button>
+        </div>
+        <p class="helper-text">雲端只同步每日行程、注意事項文字與公開網址。重要資訊及手機上傳照片只保存在這台裝置。</p>
+      </article>
+    </section>
+  </main>
+
+  <button id="floating-add" class="floating-add" type="button" aria-label="新增">＋</button>
+
+  <dialog id="trip-dialog">
+    <form id="trip-form">
+      <div class="dialog-header"><h2 id="trip-dialog-title">新增行程</h2><button class="close-button" data-close="trip-dialog" type="button">×</button></div>
+      <label>日期<select id="trip-day" name="day" required></select></label>
+      <label>時間<input id="trip-time" name="time" type="time" required></label>
+      <label>景點或行程名稱<input id="trip-name" name="name" required placeholder="例如：海雲台海灘"></label>
+      <label>地址<input id="trip-address" name="address" placeholder="有地址即可一鍵導航"></label>
+      <label>備註<textarea id="trip-note" name="note" rows="3" placeholder="例如：海邊風大，記得帶外套"></textarea></label>
+      <label>從上一站交通時間（分鐘）<input id="trip-travel-minutes" name="travelMinutes" type="number" min="0" max="300" placeholder="例如：25"></label>
+      <div class="form-actions"><button class="primary-button" type="submit">儲存行程</button><button class="secondary-button" data-close="trip-dialog" type="button">取消</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="prep-dialog">
+    <form id="prep-form">
+      <div class="dialog-header"><h2 id="prep-dialog-title">新增注意事項</h2><button class="close-button" data-close="prep-dialog" type="button">×</button></div>
+      <label>分類<select id="prep-category" name="category"><option>證件</option><option>交通</option><option>行李</option><option>健康</option><option>付款</option><option>其他</option></select></label>
+      <label>標題<input id="prep-title" name="title" required placeholder="例如：確認護照效期"></label>
+      <label>詳細說明<textarea id="prep-detail" name="detail" rows="3" placeholder="需要記住的內容"></textarea></label>
+      <label>照片網址<input id="prep-image" name="image" type="text" placeholder="https://... 圖片網址"></label>
+      <label class="file-button">或直接選擇手機照片<input id="prep-photo-file" type="file" accept="image/*"></label>
+      <img id="prep-photo-preview" class="prep-image form-preview" alt="照片預覽" hidden>
+      <label>相關連結<input id="prep-link" name="link" type="url" placeholder="https://... 網頁連結"></label>
+      <div class="form-actions"><button class="primary-button" type="submit">儲存注意事項</button><button class="secondary-button" data-close="prep-dialog" type="button">取消</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="info-dialog">
+    <form id="info-form">
+      <div class="dialog-header"><h2>編輯重要資訊</h2><button class="close-button" data-close="info-dialog" type="button">×</button></div>
+      <h3>去程航班</h3>
+      <label>航班編號<input id="outbound-flight" name="outboundFlight" placeholder="例如：BX794"></label>
+      <label>起飛與抵達時間<input id="outbound-time" name="outboundTime" placeholder="例如：10/17 09:00 → 12:10"></label>
+      <h3>回程航班</h3>
+      <label>航班編號<input id="return-flight" name="returnFlight" placeholder="例如：BX793"></label>
+      <label>起飛與抵達時間<input id="return-time" name="returnTime" placeholder="例如：10/20 14:30 → 16:10"></label>
+      <h3>飯店</h3>
+      <label>飯店名稱<input id="hotel-name" name="hotelName"></label>
+      <label>飯店地址<input id="hotel-address" name="hotelAddress"></label>
+      <label>飯店電話<input id="hotel-phone" name="hotelPhone" type="tel"></label>
+      <h3>緊急聯絡</h3>
+      <label>聯絡人<input id="emergency-name" name="emergencyName"></label>
+      <label>電話<input id="emergency-phone" name="emergencyPhone" type="tel"></label>
+      <label>旅遊保險資訊<textarea id="insurance" name="insurance" rows="2"></textarea></label>
+      <div class="form-actions"><button class="primary-button" type="submit">儲存重要資訊</button><button class="secondary-button" data-close="info-dialog" type="button">取消</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="backup-dialog">
+    <div class="dialog-header"><h2>備份與還原</h2><button class="close-button" data-close="backup-dialog" type="button">×</button></div>
+    <p class="helper-text">備份包含每日行程與行前注意事項。</p>
+    <button id="export-button" class="primary-button full-width" type="button">下載備份檔</button>
+    <label class="file-button">從備份檔還原<input id="import-input" type="file" accept="application/json"></label>
+    <button id="reset-button" class="danger-link" type="button">恢復預設資料</button>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script type="module" src="cloud-sync.js"></script>
+</body>
+</html>
