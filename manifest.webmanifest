@@ -1,0 +1,9 @@
+{
+  "name": "釜山安心遊",
+  "short_name": "釜山行程",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fffdf7",
+  "theme_color": "#075985",
+  "description": "六人釜山四天三夜行程與行前準備工具"
+}
